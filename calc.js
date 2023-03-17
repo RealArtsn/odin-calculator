@@ -1,18 +1,13 @@
 // initialize calculator object
-const calculator = {
-    stored: 0,
-    currentOperation: ''
-};
-
+const calculator = new Object();
 
 // on page load
 function init() {
-
-    // get all buttons
-    buttons = document.querySelectorAll('.button');
+    // set calculator properties
+    resetCalculator();
     
     // add a click listener to every button
-    buttons.forEach(button => {
+    document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', handleButtonClick);
     })
 
@@ -23,11 +18,13 @@ function handleButtonClick(e) {
     // if number is clicked, append to display
     if (this.classList.contains('num')) {
         // store previous number and input new one if operator was selected
-        const operation = getCurrentOperation();
-        if (operation) {
-            
+        if (getClearOnEntry()) {
+            // store previous number
+            storeDisplayedNumber();
+            // clear display to make way for new number
             clearDisplay();
-
+            // allow subsequent number entries to concat
+            setClearOnEntry(false);
         }
         concatDisplay(this.querySelector('h2').textContent);
         return;
@@ -36,10 +33,22 @@ function handleButtonClick(e) {
     // set current operation if operator is selected
     if (['add','subtract','divide','multiply'].includes(this.id)) {
         setCurrentOperation(this.id);
+        setClearOnEntry(true)
+        return
     }
 
     // decide what to do if other key is clicked
     switch (this.id) {
+        case '=':
+            if (getStoredNumber() === NaN) break;
+            console.log('operating');
+            console.log('current operation: ' + getCurrentOperation());
+            console.log('stored number: ' + getStoredNumber());
+            console.log('displayed number: ' + getDisplayedNumber());
+            const result = operate(getCurrentOperation(), getStoredNumber(), getDisplayedNumber());
+            console.log('result: ' + result);
+            setDisplayedNumber(result);
+            break;
         case 'C':
             clearDisplay();
             break;
@@ -59,12 +68,6 @@ function setStoredNumber(n) {
     calculator.stored = n;
 }
 
-// clear stored number and display
-function resetCalculator() {
-    clearDisplay();
-    calculator.stored = 0;
-    calculator.currentOperation = '';
-}
 
 function getStoredNumber() {
     return calculator.stored;
@@ -72,15 +75,19 @@ function getStoredNumber() {
 
 // take operator and two numbers and return calculation
 function operate(operator, a, b) {
+    // convert to numbers
+    a = +a;
+    b = +b;
+    
+    // select operation based on provided string
     switch (operator) {
-        // https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
-        case '+': // U+002B
+        case 'add': 
             return add(a, b);
-        case '−': // U+2212
+        case 'subtract': 
             return subtract(a, b);
-        case 'X': // just X
+        case 'multiply': 
             return multiply(a, b);
-        case '÷': // U+00F7
+        case 'divide': 
             return divide(a, b);
     }
 }
@@ -91,7 +98,7 @@ function add(a, b) {
 }
 // subtract
 function subtract(a, b) {
-    return a + b;
+    return a - b;
 }
 // multiply
 function multiply(a, b) {
@@ -107,18 +114,20 @@ function getDisplayedNumber() {
     return document.querySelector('#display h1').textContent;
 }
 
+// set number to be displayed on calculator
 function setDisplayedNumber(number) {
-    const displayNode = document.querySelector('#display h1');
-    console.log(displayNode);
-    console.log('text before setting:' + displayNode.textContent);
     console.log('setting display to ' + number);
-    displayNode.textContent = number;
-    console.log('text after setting: ' + displayNode.textContent)
+    document.querySelector('#display h1').textContent = number;
 }
 
 
 // concatenate number to display
 function concatDisplay(n) {
+    // clear if initial number is 0
+    if (getDisplayedNumber() === '0') {
+        clearDisplay();
+    }
+    // add number to end of display
     setDisplayedNumber(getDisplayedNumber() + n);
 }
 
@@ -127,12 +136,33 @@ function clearDisplay() {
     setDisplayedNumber('');
 }
 
+// get currently selected operation
 function getCurrentOperation() {
     return calculator.currentOperation;
 }
 
+// set currently selected operation
 function setCurrentOperation(operation) {
     calculator.currentOperation = operation;
+}
+
+// return whether next entry should clear display
+function getClearOnEntry() {
+    return calculator.clearOnEntry;
+}
+
+// set whether next entry should clear display
+function setClearOnEntry(bool) {
+    calculator.clearOnEntry = bool;
+}
+
+// reset entire calculator
+function resetCalculator() {
+    clearDisplay();
+    setStoredNumber(NaN);
+    setCurrentOperation('');
+    setClearOnEntry(false);
+    setDisplayedNumber(0);
 }
 
 // run init function on page load
