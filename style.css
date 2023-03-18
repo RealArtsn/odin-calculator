@@ -3,9 +3,16 @@ body {
     justify-content: center;
     align-items: center;
     font-family: sans-serif;
+    background-color: slategray;
+}
+
+#display,
+.button {
+    background-color:slateblue;
 }
 
 #calculator {
+    background-color: rgb(61, 29, 175);
     display:flex;
     width: 400px;
     height: 500px;
@@ -14,6 +21,7 @@ body {
     flex-shrink:0;
     align-items: center;
     flex-direction: column;
+    border-radius: 10px;
 
 }
 #display {
@@ -23,6 +31,16 @@ body {
     height: 50px;
     border-style: solid;
     margin: 20px 0px;
+}
+#display * {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+}
+/* negative sign */
+#display span {
+    margin-left: 5px;
+    width:5px;
 }
 #numpad {
     display:flex;
