@@ -67,6 +67,10 @@ body {
     border-radius: 10px;
 }
 
+.pushed {
+    background-color: rgb(61, 50, 128);
+}
+
 #display h1 {
     margin:5px;    
 }

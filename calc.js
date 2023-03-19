@@ -16,6 +16,25 @@ function init() {
 
 // action performed when button is clicked
 function handleButtonClick(e) {
+
+    // set current operation if operator is selected
+    if (['add','subtract','divide','multiply'].includes(this.id)) {
+        // do last operation if number is stored
+        if (getStoredNumber() && getCurrentOperation() && !getClearOnEntry()) {
+            // do the stored operation
+            operateStoreAndDisplay(getCurrentOperation(), getStoredNumber(), getCurrentNumber());
+            // disallow = repetition
+            setEqualCanRepeat(false);
+        }
+
+        setCurrentOperation(this.id);
+        setClearOnEntry(true)
+        return
+    }
+
+    // push and release because it's not an operation
+    pushAndReleaseButton(this);
+
     // if number is clicked, append to display
     if (this.classList.contains('num')) {
         // don't allow equal repeat because numbers changed
@@ -33,23 +52,6 @@ function handleButtonClick(e) {
         const textContent = this.querySelector('h2').textContent;
         concatDisplay(textContent);
         return;
-    }
-
-
-
-    // set current operation if operator is selected
-    if (['add','subtract','divide','multiply'].includes(this.id)) {
-        // do last operation if number is stored
-        if (getStoredNumber() && getCurrentOperation() && !getClearOnEntry()) {
-            // do the stored operation
-            operateStoreAndDisplay(getCurrentOperation(), getStoredNumber(), getCurrentNumber());
-            // disallow = repetition
-            setEqualCanRepeat(false);
-        }
-
-        setCurrentOperation(this.id);
-        setClearOnEntry(true)
-        return
     }
 
     // decide what to do if other key is clicked
@@ -243,13 +245,15 @@ function setDisplayedNumber(number) {
     } else {
         // remove redundant sign at start of string
         number = number.replace('-','');
-        // set number to fixed digits and then remove trailing zero's
-        number = parseFloat((+number).toPrecision(calculator.MAX_DIGITS));
-        // convert to exponent notation if exceeds max digits
-        if (number.toFixed().length >= calculator.MAX_DIGITS) {
-            number = (+number).toExponential()
+        // do additional rounding if the number is long enough
+        if (number.length >= calculator.MAX_DIGITS) {
+            // set number to fixed digits and then remove trailing zero's
+            number = parseFloat((+number).toPrecision(calculator.MAX_DIGITS));
+            // convert to exponent notation if it still exceeds max digits
+            if (number.toFixed().length >= calculator.MAX_DIGITS) {
+                number = (+number).toExponential();
+            }
         }
-
     }
     getDisplayTextNode().textContent = number;
 }
@@ -367,7 +371,20 @@ function digitsAfterDecimal(n) {
     return splitString.length === 2 ? splitString[1].length : 0;
 }
 
+// UI //
+function pushAndReleaseButton(button) {
+    const PUSH_TIMEOUT = 100;
+    pushButton(button);
+    setTimeout(releaseButton, PUSH_TIMEOUT, button);
+}
 
+function pushButton(button) {
+    button.classList.add('pushed');
+}
+
+function releaseButton(button) {
+    button.classList.remove('pushed');
+}
 
 // run init function on page load
 init();
