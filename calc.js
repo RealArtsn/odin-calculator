@@ -95,6 +95,12 @@ function handleButtonClick(e) {
             if (getClearOnEntry()) return;
             negateDisplayedNumber();
             break;
+        // square root and instantly provide answer
+        case 'sqrt':
+            // ignore input if imaginary
+            if (displayingNegative()) return;
+            sqrtDisplayedNumber();
+            break;
     }
 }
 
@@ -159,6 +165,23 @@ function operate(operator, a, b) {
     }
     // divide to get float result
     return intProduct / M;
+}
+
+// set positive to negative and vice versa
+function negateDisplayedNumber() {
+    // if last 'digit' is a point (.) indicate that it should be appended back on to the end
+    const endsWithPoint = (getLastCharOnDisplay() === '.');
+    const numberString = getDisplayedNumber();
+    // convert string to number and back to string then multiply by negative 1
+    let negativeNumber = String(+numberString * -1);
+    // add back '.' at the end if there was one to begin with
+    negativeNumber = endsWithPoint ? negativeNumber + '.' : negativeNumber;
+    setDisplayedNumber(negativeNumber);
+}
+
+function sqrtDisplayedNumber() {
+    // display square root of displayed number
+    setDisplayedNumber(Math.sqrt(getDisplayedNumber()));
 }
 
 // concatenate number to display
@@ -284,18 +307,6 @@ function getLastCharOnDisplay() {
 // get node for displayed text
 function getDisplayTextNode() {
     return document.querySelector('#display h1');
-}
-
-// set positive to negative and vice versa
-function negateDisplayedNumber() {
-    // if last 'digit' is a point (.) indicate that it should be appended back on to the end
-    const endsWithPoint = (getLastCharOnDisplay() === '.');
-    const numberString = getDisplayedNumber();
-    // convert string to number and back to string then multiply by negative 1
-    let negativeNumber = String(+numberString * -1);
-    // add back '.' at the end if there was one to begin with
-    negativeNumber = endsWithPoint ? negativeNumber + '.' : negativeNumber;
-    setDisplayedNumber(negativeNumber);
 }
 
 // store whether there is a decimal point on display
