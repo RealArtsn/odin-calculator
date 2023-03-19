@@ -244,13 +244,15 @@ function setDisplayedNumber(number) {
         number = 'ERROR';
     } else {
         // remove redundant sign at start of string
-        number = number.replace('-','');
+        // number = number.replace('-','');
         // do additional rounding if the number is long enough
         if (number.length >= calculator.MAX_DIGITS) {
+            console.log('rounding')
             // set number to fixed digits and then remove trailing zero's
-            number = parseFloat((+number).toPrecision(calculator.MAX_DIGITS));
+            number = parseFloat((+number).toPrecision(calculator.MAX_DIGITS - 1));
             // convert to exponent notation if it still exceeds max digits
-            if (number.toFixed().length >= calculator.MAX_DIGITS) {
+            if (String(number).length > calculator.MAX_DIGITS) {
+                console.log('rounding to exponential');
                 number = (+number).toExponential();
             }
         }
