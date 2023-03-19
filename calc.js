@@ -41,7 +41,7 @@ function handleButtonClick(e) {
         // do last operation if number is stored
         if (getStoredNumber() && getCurrentOperation() && !getClearOnEntry()) {
             // do the stored operation
-            operateStoreAndDisplay(getCurrentOperation(), getStoredNumber(), getDisplayedNumber());
+            operateStoreAndDisplay(getCurrentOperation(), getStoredNumber(), getCurrentNumber());
             // disallow = repetition
             setEqualCanRepeat(false);
         }
@@ -79,7 +79,7 @@ function handleButtonClick(e) {
             }
             // if no number stored, do not operate
             if (isNaN(getStoredNumber())) break;
-            operateStoreAndDisplay(getCurrentOperation(), getStoredNumber(), getDisplayedNumber())
+            operateStoreAndDisplay(getCurrentOperation(), getStoredNumber(), getCurrentNumber())
             // allow equal repetition
             setEqualCanRepeat(true);
             break;
@@ -126,9 +126,9 @@ function repeatLastEval() {
     operateStoreAndDisplay(lastEval[0], getStoredNumber(), lastEval[1]);
 }
 
-// store displayed number to calculator object
+// store displayed number to calculator memory
 function storeDisplayedNumber() {
-    setStoredNumber(+getDisplayedNumber());
+    setStoredNumber(+getCurrentNumber());
 }
 
 // take operator and two numbers and return calculation
@@ -141,20 +141,23 @@ function operate(operator, a, b) {
 
 
     // define float conversion variables in case of add or subtract
-    let intProduct, M;
 
     // select operation based on provided string
+    // do the math without fancy float stuff if just multiply or divide
     switch (operator) {
         case 'multiply': 
             return multiply(a, b);
         case 'divide': 
             return divide(a, b);
-        case operator:
-            // convert to integer for addition and subtraction
-            M = 10 ** digitsAfterDecimal(b);
-            // multiply to convert to integer
-            a = a * M;
-            b = b * M;
+    }
+
+    // convert to integer for addition and subtraction
+    const M = 10 ** digitsAfterDecimal(b);
+    // multiply to convert to integer
+    a = a * M;
+    b = b * M;
+    let intProduct;
+    switch (operator) {
         // for adding and subtracting, break instead of return to allow integer conversion        
         case 'add': 
             intProduct = add(a, b);
@@ -171,7 +174,7 @@ function operate(operator, a, b) {
 function negateDisplayedNumber() {
     // if last 'digit' is a point (.) indicate that it should be appended back on to the end
     const endsWithPoint = (getLastCharOnDisplay() === '.');
-    const numberString = getDisplayedNumber();
+    const numberString = getCurrentNumber();
     // convert string to number and back to string then multiply by negative 1
     let negativeNumber = String(+numberString * -1);
     // add back '.' at the end if there was one to begin with
@@ -181,17 +184,17 @@ function negateDisplayedNumber() {
 
 function sqrtDisplayedNumber() {
     // display square root of displayed number
-    setDisplayedNumber(Math.sqrt(getDisplayedNumber()));
+    setDisplayedNumber(Math.sqrt(getCurrentNumber()));
 }
 
 // concatenate number to display
 function concatDisplay(n) {
     // clear if initial number is 0 and it is not displaying a decimal
-    if (getDisplayedNumber() === '0' && !getDisplayingFloat()) {
+    if (getCurrentNumber() === '0' && !getDisplayingFloat()) {
         clearDisplay();
     }
     // add number to end of display
-    setDisplayedNumber(getDisplayedNumber() + n);
+    setDisplayedNumber(getCurrentNumber() + n);
 }
 
 // clear display
@@ -228,6 +231,7 @@ function getDisplayedNumber() {
 
 // set number to be displayed on calculator
 function setDisplayedNumber(number) {
+    setCurrentNumber(number);
     // ensure input number is a string
     number = String(number);
     console.log('setting display to ' + number);
@@ -253,6 +257,16 @@ function setDisplayedNumber(number) {
     }
     getDisplayTextNode().textContent = number;
 }
+
+// store current working number
+function setCurrentNumber(number) {
+    calculator.currentNumber = number;
+}
+
+function getCurrentNumber() {
+    return calculator.currentNumber;
+}
+
 
 // get currently selected operation
 function getCurrentOperation() {
@@ -323,6 +337,7 @@ function getDisplayingFloat() {
 function resetCalculator() {
     clearDisplay();
     // run all setters
+    setCurrentNumber(NaN);
     setStoredNumber(NaN);
     setCurrentOperation('');
     setClearOnEntry(false);
