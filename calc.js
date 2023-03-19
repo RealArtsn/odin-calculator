@@ -189,11 +189,12 @@ function sqrtDisplayedNumber() {
 
 // concatenate number to display
 function concatDisplay(n) {
-    // clear if initial number is 0 and it is not displaying a decimal
-    if (getCurrentNumber() === '0' && !getDisplayingFloat()) {
-        clearDisplay();
+    // replace lone 0 with entered number if not a decimal
+    if (getCurrentNumber() === '0' && n !== '.') {
+        setDisplayedNumber(n);
+        return
     }
-    // add number to end of display
+    // append entered number to end of display
     setDisplayedNumber(getCurrentNumber() + n);
 }
 
@@ -202,7 +203,7 @@ function clearDisplay() {
     // cleared display no longer has float value
     setDisplayingFloat(false);
     // remove everything from display
-    setDisplayedNumber('');
+    setDisplayedNumber('0');
 }
 
 // GETTERS AND SETTERS //
@@ -214,19 +215,6 @@ function setStoredNumber(n) {
 
 function getStoredNumber() {
     return calculator.stored;
-}
-
-// get string representation of number currently displayed
-function getDisplayedNumber() {
-    // return  number, multiplying by -1 if negative sign is displayed
-    const number = getDisplayTextNode().textContent
-    // store every digit after and including decimal
-    const splitOnDecimal = String(number).split('.')
-    const decimalAndTrailingDigits = splitOnDecimal.length === 2 ? '.' + splitOnDecimal[1] : '';
-    const digitsBeforeDecimal = splitOnDecimal[0]
-    const stringNegated = String(digitsBeforeDecimal * (displayingNegative() ? -1 : 1) + decimalAndTrailingDigits);
-    // return string with '.' at end if there was a point at the end to begin with
-    return stringNegated;
 }
 
 // set number to be displayed on calculator
@@ -242,18 +230,13 @@ function setDisplayedNumber(number) {
     } else {
         negativeSpan.textContent = '';
     }
-    // // if last 'digit' is a point (.) indicate that it should be appended back on to the end
-    // const endsWithPoint = (String(number).at(-1) === '.');
-    // store every digit after and including decimal
-    const splitOnDecimal = String(number).split('.')
-    const decimalAndTrailingDigits = splitOnDecimal.length === 2 ? '.' + splitOnDecimal[1] : '';
-    const digitsBeforeDecimal = splitOnDecimal[0]
-    // display error if not a number, otherwise display absolute value
+
+    // display error if not a number, otherwise remove sign, round, and display
     if (isNaN(+number)) {
         number = 'ERROR';
     } else {
-        // get the absolute value of the integer and then append trailing digits
-        number = Math.abs(digitsBeforeDecimal) + decimalAndTrailingDigits;
+        // remove redundant sign at start of string
+        number = number.replace('-','');
     }
     getDisplayTextNode().textContent = number;
 }
@@ -337,11 +320,10 @@ function getDisplayingFloat() {
 function resetCalculator() {
     clearDisplay();
     // run all setters
-    setCurrentNumber(NaN);
     setStoredNumber(NaN);
     setCurrentOperation('');
     setClearOnEntry(false);
-    setDisplayedNumber(0);
+    setDisplayedNumber('0');
     setLastEval(null);
     setEqualCanRepeat(false);
 }
