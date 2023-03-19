@@ -1,5 +1,6 @@
 // initialize calculator object
 const calculator = new Object();
+calculator.MAX_DIGITS = 13;
 
 // on page load
 function init() {
@@ -189,6 +190,11 @@ function sqrtDisplayedNumber() {
 
 // concatenate number to display
 function concatDisplay(n) {
+    // refuse to concat display if number is too large
+    if (getDisplayTextNode().textContent.length >= calculator.MAX_DIGITS) {
+        console.log('Max digits reached.');
+        return;
+    };
     // replace lone 0 with entered number if not a decimal
     if (getCurrentNumber() === '0' && n !== '.') {
         setDisplayedNumber(n);
@@ -237,6 +243,13 @@ function setDisplayedNumber(number) {
     } else {
         // remove redundant sign at start of string
         number = number.replace('-','');
+        // set number to fixed digits and then remove trailing zero's
+        number = parseFloat((+number).toPrecision(calculator.MAX_DIGITS));
+        // convert to exponent notation if exceeds max digits
+        if (number.toFixed().length >= calculator.MAX_DIGITS) {
+            number = (+number).toExponential()
+        }
+
     }
     getDisplayTextNode().textContent = number;
 }
