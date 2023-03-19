@@ -243,8 +243,12 @@ function setDisplayedNumber(number) {
     if (isNaN(+number)) {
         number = 'ERROR';
     } else {
-        // remove redundant sign at start of string
-        // number = number.replace('-','');
+        // remove redundant sign at start of string if negative number is currently displayed
+        if (displayingNegative()) {
+            // run replace method only if number is negative,
+            //  otherwise e- notation may be misrepresented
+            number = number.replace('-','');
+        }
         // do additional rounding if the number is long enough
         if (number.length >= calculator.MAX_DIGITS) {
             console.log('rounding')
