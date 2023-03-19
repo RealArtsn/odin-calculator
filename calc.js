@@ -281,6 +281,14 @@ function getCurrentOperation() {
 
 // set currently selected operation
 function setCurrentOperation(operation) {
+    // unpush previous element button
+    if (getCurrentOperation()) {
+        releaseButton(document.querySelector(`#${getCurrentOperation()}`));
+    }
+    // push the button for corresponding element
+    if (operation) {
+        pushButton(document.querySelector(`#${operation}`));
+    }
     calculator.currentOperation = operation;
 }
 
