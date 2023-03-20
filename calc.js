@@ -259,7 +259,7 @@ function setDisplayedNumber(number) {
         if (number.length >= calculator.MAX_DIGITS) {
             console.log('rounding')
             // set number to fixed digits and then remove trailing zero's
-            number = parseFloat((+number).toPrecision(calculator.MAX_DIGITS - 1));
+            number = parseFloat((+number).toPrecision(calculator.MAX_DIGITS));
             // convert to exponent notation if it still exceeds max digits
             if (String(number).length > calculator.MAX_DIGITS) {
                 console.log('rounding to exponential');
