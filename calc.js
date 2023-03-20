@@ -87,8 +87,9 @@ function handleButtonClick(e) {
             setEqualCanRepeat(true);
             break;
         case 'C':
+            // if number is going to clear anyway, do nothing
+            if (getClearOnEntry()) break;
             clearDisplay();
-            setDisplayedNumber(0);
             break;
         case 'CE':
             resetCalculator();
@@ -354,7 +355,6 @@ function resetCalculator() {
     setStoredNumber(NaN);
     setCurrentOperation('');
     setClearOnEntry(false);
-    setDisplayedNumber('0');
     setLastEval(null);
     setEqualCanRepeat(false);
 }
