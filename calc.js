@@ -82,6 +82,9 @@ function handleButtonClick(e) {
             }
             // if no number stored, do not operate
             if (isNaN(getStoredNumber())) break;
+            // if no current operation, do not operate
+            if (!getCurrentOperation()) break;
+            // complete operation and display result
             operateStoreAndDisplay(getCurrentOperation(), getStoredNumber(), getCurrentNumber())
             // allow equal repetition
             setEqualCanRepeat(true);
