@@ -107,6 +107,8 @@ function handleButtonClick(e) {
             // ignore input if imaginary
             if (displayingNegative()) return;
             sqrtDisplayedNumber();
+            // prevent numbers from being appended to result
+            setClearOnEntry(true);
             break;
     }
 }
